@@ -39,28 +39,6 @@ int main()
             case 1: 
                 On_goingMovies();
                 break;
-            // case 2:
-            //     if(insertStudent(students, &n))
-            //         printf("\nStudent added successfully!\n");
-            //     else
-            //         printf("\nArray is full! Cannot add more students.\n");
-            //     break;
-            // case 3:
-            //     printf("\nEnter the name of the student to delete: ");
-            //     scanf(" %[^\n]", name);
-            //     if (deleteStudent(students, &n, name))
-            //         printf("\nStudent deleted successfully!\n");
-            //     else
-            //         printf("\nStudent not found!\n");
-            //     break;
-            // case 4:
-            //     printf("\nEnter the ID of the student to modify: ");
-            //     scanf("%d", &id);
-            //     modifyStudent(students, n, id);
-            //     break;
-            // case 5:
-            //     printf("\nExiting program...\n");
-            //     break;
             default:
                 printf("\nInvalid choice! Try again.\n");
         } 
