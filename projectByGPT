@@ -1,0 +1,142 @@
+#include <stdio.h>
+#include <string.h>
+
+// Structure to store movie details
+typedef struct {
+    char name[50];
+    float rating;
+} Movie;
+
+// Structure to store theatre details
+typedef struct {
+    char name[50];
+    Movie movies[5];
+} Theatre;
+
+// Predefined theatres and movies
+Theatre theatres[6] = {
+    {"Theatre 1", {{"Movie A", 4.5}, {"Movie B", 4.2}, {"Movie C", 4.8}, {"Movie D", 4.1}, {"Movie E", 3.9}}},
+    {"Theatre 2", {{"Movie F", 4.6}, {"Movie G", 4.3}, {"Movie H", 4.7}, {"Movie I", 4.2}, {"Movie J", 4.0}}},
+    {"Theatre 3", {{"Movie K", 4.4}, {"Movie L", 4.1}, {"Movie M", 4.9}, {"Movie N", 4.3}, {"Movie O", 3.8}}},
+    {"Theatre 4", {{"Movie P", 4.7}, {"Movie Q", 4.5}, {"Movie R", 4.6}, {"Movie S", 4.0}, {"Movie T", 3.7}}},
+    {"Theatre 5", {{"Movie U", 4.8}, {"Movie V", 4.6}, {"Movie W", 4.3}, {"Movie X", 4.1}, {"Movie Y", 3.5}}},
+    {"Theatre 6", {{"Movie Z", 4.9}, {"Movie AA", 4.7}, {"Movie BB", 4.5}, {"Movie CC", 4.2}, {"Movie DD", 3.8}}}
+};
+
+// Login function
+int login() {
+    char username[20], password[20];
+    printf("Enter username: ");
+    scanf("%s", username);
+    printf("Enter password: ");
+    scanf("%s", password);
+    
+    if (strcmp(username, "admin") == 0 && strcmp(password, "1234") == 0) {
+        printf("Login successful!\n");
+        return 1;
+    } else {
+        printf("Invalid credentials! Try again.\n");
+        return 0;
+    }
+}
+
+// Main booking system
+void bookTicket() {
+    int theatreChoice, movieChoice, ticketType, timeChoice, seatNumber;
+    float vipFare = 500.0, nonVipFare = 300.0, amount;
+    char paymentOption[10], transactionId[20];
+
+    // Select Theatre
+    printf("\nSelect a Theatre:\n");
+    for (int i = 0; i < 6; i++) {
+        printf("%d. %s\n", i + 1, theatres[i].name);
+    }
+    printf("Enter your choice: ");
+    scanf("%d", &theatreChoice);
+    
+    if (theatreChoice < 1 || theatreChoice > 6) {
+        printf("Invalid selection! Exiting.\n");
+        return;
+    }
+    
+    // Select Movie
+    printf("\nMovies in %s:\n", theatres[theatreChoice - 1].name);
+    for (int i = 0; i < 5; i++) {
+        printf("%d. %s (%.1f)\n", i + 1, theatres[theatreChoice - 1].movies[i].name, theatres[theatreChoice - 1].movies[i].rating);
+    }
+    printf("Enter your choice: ");
+    scanf("%d", &movieChoice);
+
+    if (movieChoice < 1 || movieChoice > 5) {
+        printf("Invalid selection! Exiting.\n");
+        return;
+    }
+    
+    // Select Ticket Type
+    printf("\nSelect Ticket Type:\n1. VIP (Tk. 500)\n2. Non-VIP (Tk. 300)\nEnter choice: ");
+    scanf("%d", &ticketType);
+    
+    if (ticketType == 1) {
+        amount = vipFare;
+    } else if (ticketType == 2) {
+        amount = nonVipFare;
+    } else {
+        printf("Invalid selection! Exiting.\n");
+        return;
+    }
+    
+    // Select Showtime
+    printf("\nSelect Showtime:\n1. 11:20 AM\n2. 4:30 PM\n3. 8:30 PM\nEnter choice: ");
+    scanf("%d", &timeChoice);
+    
+    if (timeChoice < 1 || timeChoice > 3) {
+        printf("Invalid selection! Exiting.\n");
+        return;
+    }
+    
+    // Select Seat
+    printf("\nEnter seat number (1-100): ");
+    scanf("%d", &seatNumber);
+    
+    if (seatNumber < 1 || seatNumber > 100) {
+        printf("Invalid seat number! Exiting.\n");
+        return;
+    }
+
+    // Payment Selection
+    printf("\nChoose Payment Option (Bkash/Nagad/Rocket): ");
+    scanf("%s", paymentOption);
+    
+    // Payment Confirmation
+    printf("Enter amount: Tk. ");
+    scanf("%f", &amount);
+    
+    printf("Enter Transaction ID: ");
+    scanf("%s", transactionId);
+    
+    // Payment Success
+    printf("\nPayment Successful!\n");
+    printf("Booking Details:\n");
+    printf("Theatre: %s\n", theatres[theatreChoice - 1].name);
+    printf("Movie: %s\n", theatres[theatreChoice - 1].movies[movieChoice - 1].name);
+    printf("Ticket Type: %s\n", (ticketType == 1) ? "VIP" : "Non-VIP");
+    printf("Showtime: %s\n", (timeChoice == 1) ? "11:20 AM" : (timeChoice == 2) ? "4:30 PM" : "8:30 PM");
+    printf("Seat Number: %d\n", seatNumber);
+    printf("Payment Method: %s\n", paymentOption);
+    printf("Transaction ID: %s\n", transactionId);
+    printf("Enjoy your movie!\n");
+}
+
+int main() {
+    printf("Welcome to Cinema Booking System!\n");
+
+    // Login Process
+    if (!login()) {
+        return 0;
+    }
+
+    // Start Booking
+    bookTicket();
+
+    return 0;
+}
