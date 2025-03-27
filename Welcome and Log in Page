@@ -1,0 +1,30 @@
+
+#include<stdio.h>
+int main(){
+ int i,j,a;
+  
+  for(i=0; i<=5; i++)
+    {
+        for(j=0; j<=20; j++)
+        {
+            if(i==0 || i==5)
+                printf(" * ");
+            else if (i == 2 && j == 2)
+                printf("\t\tWELCOME TO POOKIE THEATER ");
+            else
+                printf(" ");
+        }
+        printf("\n");
+    }
+
+    while(1)
+    {
+        printf("\n\t\t\tPress Enter To Continue: > <");
+        printf("\n\t\t\t\t\t\t  ~");
+        getchar();
+        break;
+    }
+
+    printf("\n Please Log into your Account");
+    return 0;
+}
