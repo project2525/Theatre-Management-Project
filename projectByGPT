@@ -3,6 +3,11 @@
 #include <string.h>
 
 #define MAX_TICKETS 10
+#define TOTAL_SEATS 120
+#define ROWS 10
+#define COLS 12
+
+int seats[TOTAL_SEATS] = {0};  // 0 = Available, 1 = Booked
 
 typedef struct {
     char name[50];
@@ -40,6 +45,7 @@ int selectTicketQuantity();
 void selectSeats(int seatNumbers[], int quantity);
 void processPayment(float amount);
 void displayTicket(Ticket ticket);
+void runTheatreBooking();
 
 int main() {
     Theatre theatres[6] = {
@@ -72,7 +78,7 @@ int main() {
     selectTicketType(ticket.seatType, &ticket.totalAmount);
 
     ticket.ticketQty = selectTicketQuantity();
-    selectSeats(ticket.seatNumbers, ticket.ticketQty);
+    runTheatreBooking();
 
     ticket.totalAmount *= ticket.ticketQty;
     printf("\nTotal Amount: %.2f Tk\n", ticket.totalAmount);
@@ -171,11 +177,60 @@ int selectTicketQuantity() {
     return qty;
 }
 
-void selectSeats(int seatNumbers[], int quantity) {
-    printf("\nEnter Seat Numbers (1-100): ");
-    for (int i = 0; i < quantity; i++) {
-        scanf("%d", &seatNumbers[i]);
+// Function to display seat pattern with seat numbers
+void displaySeats() {
+    printf("\n   SCREEN THIS WAY\n\n");
+    
+    for (int i = 0; i < ROWS; i++) {
+        printf("Row %2d: ", i + 1);
+        for (int j = 0; j < COLS; j++) {
+            int seatIndex = i * COLS + j;
+            if (seats[seatIndex] == 0) {
+                printf("%3d ", seatIndex + 1);  // Show seat number if available
+            } else {
+                printf(" X  ");  // Show 'X' for booked seats
+            }
+        }
+        printf("\n");
     }
+}
+
+// Function to book a seat
+void bookSeat(int seatNumber) {
+    if (seatNumber < 1 || seatNumber > TOTAL_SEATS) {
+        printf("Invalid seat number! Choose between 1 and %d.\n", TOTAL_SEATS);
+        return;
+    }
+    if (seats[seatNumber - 1] == 1) {
+        printf("Seat %d is already booked! Choose another seat.\n", seatNumber);
+    } else {
+        seats[seatNumber - 1] = 1;  // Mark seat as booked
+        printf("Seat %d successfully booked!\n", seatNumber);
+    }
+}
+
+// Function to start booking process
+void startBooking() {
+    int seatNumber;
+    
+    while (1) {
+        displaySeats();
+        
+        printf("\nEnter seat number to book (1-120) or 0 to exit: ");
+        scanf("%d", &seatNumber);
+        
+        if (seatNumber == 0) {
+            printf("Thank you for booking!\n");
+            return;
+        }
+        
+        bookSeat(seatNumber);
+    }
+}
+
+// Entry function to call everything
+void runTheatreBooking() {
+    startBooking();
 }
 
 void processPayment(float amount) {
