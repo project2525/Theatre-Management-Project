@@ -138,9 +138,11 @@ void bookSeat(int seatNumber) {
         printf("Seat %d is already booked! Choose another seat.\n", seatNumber);
     } else {
         seats[seatNumber - 1] = 1;  // Mark seat as booked
+        totalTickets++;  // Increment the number of booked tickets
         printf("Seat %d successfully booked!\n", seatNumber);
     }
 }
+
 // Function to start booking process
 void startBooking() {
     int seatNumber;
