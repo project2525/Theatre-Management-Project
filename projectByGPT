@@ -49,12 +49,12 @@ void runTheatreBooking();
 
 int main() {
     Theatre theatres[6] = {
-        {"Theatre 1", {{"Movie A", "2h 30m", 8.5}, {"Movie B", "2h 10m", 7.8}, {"Movie C", "2h 20m", 9.0}, {"Movie D", "1h 50m", 7.2}, {"Movie E", "2h", 8.1}}},
-        {"Theatre 2", {{"Movie F", "2h 15m", 8.3}, {"Movie G", "2h 05m", 7.5}, {"Movie H", "2h 40m", 9.2}, {"Movie I", "1h 55m", 7.9}, {"Movie J", "2h 25m", 8.4}}},
-        {"Theatre 3", {{"Movie K", "2h 20m", 8.1}, {"Movie L", "2h 30m", 7.9}, {"Movie M", "2h 10m", 9.3}, {"Movie N", "2h 00m", 7.4}, {"Movie O", "1h 45m", 8.0}}},
-        {"Theatre 4", {{"Movie P", "2h 35m", 8.6}, {"Movie Q", "2h 15m", 7.3}, {"Movie R", "2h 25m", 9.1}, {"Movie S", "1h 50m", 7.6}, {"Movie T", "2h 05m", 8.2}}},
-        {"Theatre 5", {{"Movie U", "2h 10m", 8.7}, {"Movie V", "2h 20m", 7.7}, {"Movie W", "2h 30m", 9.4}, {"Movie X", "1h 55m", 7.8}, {"Movie Y", "2h 15m", 8.3}}},
-        {"Theatre 6", {{"Movie Z", "2h 25m", 8.9}, {"Movie AA", "2h 05m", 7.6}, {"Movie BB", "2h 35m", 9.0}, {"Movie CC", "1h 50m", 7.2}, {"Movie DD", "2h 10m", 8.5}}}
+        {"Bashundhara Cineplex", {{"Inception", "2h 28m", 8.8}, {"Dangal", "2h 49m", 8.4}, {"The Dark Knight", "2h 32m", 9.0}, {"3 Idiots", "2h 51m", 8.4}, {"Titanic", "3h 14m", 7.9}}},
+        {"Uttara Cineplex", {{"Interstellar", "2h 49m", 8.6}, {"Sholay", "3h 24m", 8.2}, {"Avengers: Endgame", "3h 2m", 8.4}, {"Lagaan", "3h 44m", 8.1}, {"The Shawshank Redemption", "2h 22m", 9.3}}},
+        {"Jamuna Future Cineplex", {{"Gladiator", "2h 35m", 8.5}, {"Gully Boy", "2h 34m", 8.0}, {"The Godfather", "2h 55m", 9.2}, {"Zindagi Na Milegi Dobara", "2h 34m", 8.1}, {"The Matrix", "2h 16m", 8.7}}},
+        {"Shyamoli Mall Cineplex", {{"Joker", "2h 2m", 8.4}, {"Kabir Singh", "2h 52m", 7.1}, {"Fight Club", "2h 19m", 8.8}, {"Bajirao Mastani", "2h 38m", 7.9}, {"Forrest Gump", "2h 22m", 8.8}}},
+        {"Savar Cineplex", {{"The Wolf of Wall Street", "3h", 8.2}, {"Padmaavat", "2h 44m", 7.0}, {"Pulp Fiction", "2h 34m", 8.9}, {"Barfi!", "2h 31m", 8.1}, {"The Revenant", "2h 36m", 8.0}}},
+        {"Purbachal Cine Park", {{"The Lion King", "1h 58m", 8.5}, {"Andhadhun", "2h 19m", 8.3}, {"Schindler's List", "3h 15m", 9.0}, {"Swades", "3h 9m", 8.2}, {"The Prestige", "2h 10m", 8.5}}}
     };
 
     welcomeMessage();
@@ -283,7 +283,26 @@ void processPayment(float amount) {
 }
 
 void displayTicket(Ticket ticket) {
+    FILE *file = fopen("ticket_receipt.txt", "a");  // Open file in append mode
+    if (file == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+
     printf("\nYour Ticket Details:\n");
     printf("Theatre: %s\nMovie: %s\nDuration: %s\nHall: %s\nTime: %s\nSeat Type: %s\nTickets: %d\nTotal Amount: %.2f Tk\n",
         ticket.theatre, ticket.movie, ticket.duration, ticket.hall, ticket.time, ticket.seatType, ticket.ticketQty, ticket.totalAmount);
+
+    fprintf(file, "-----------------------------------------\n");
+    fprintf(file, "Theatre: %s\nMovie: %s\nDuration: %s\nHall: %s\nTime: %s\nSeat Type: %s\nTickets: %d\nTotal Amount: %.2f Tk\n",
+        ticket.theatre, ticket.movie, ticket.duration, ticket.hall, ticket.time, ticket.seatType, ticket.ticketQty, ticket.totalAmount);
+    
+    fprintf(file, "Seats: ");
+    for (int i = 0; i < ticket.ticketQty; i++) {
+        fprintf(file, "%d ", ticket.seatNumbers[i]);
+    }
+    fprintf(file, "\n-----------------------------------------\n");
+
+    fclose(file);  // Close the file
+    printf("\nReceipt saved to 'ticket_receipt.txt'.\n");
 }
