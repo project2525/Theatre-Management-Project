@@ -1,35 +1,52 @@
 #include<stdio.h>
 #include<string.h>
+#include<stdlib.h>
 
-//function declaration
+#define TOTAL_SEATS 120
+#define ROWS 10
+#define COLS 12
+
+// Global variables
+int seats[TOTAL_SEATS] = {0};
+int ticketPrice = 500;
+int totalTickets = 0;
+int bookedSeats[120];
+char movieName[50], timeSelected[50], dateSelected[50], hall[50], paymentMethod[50];
+char userName[50];
+char userEmail[100];
+char userPhone[20];
+
+// On-going and Upcoming movie lists
+char ongoingMovies[3][50] = {"Mufasa", "La La Land", "Dunki"};
+char upcomingMovies[5][50] = {"The Flash", "Guardians of the Galaxy Vol. 3", "Avatar 2", "Jurassic World: Dominion", "Spider-Man: No Way Home"};
+
+// Movie request structure
+struct MovieRequest {
+    char name[50];
+    char email[100];
+    char movie[100];
+} requests[100];
+int requestCount = 0;
+
+// Function declarations
 void On_goingMovies();
 void select_movie();
 void displaySeats();
 void bookSeat(int seatNumber);
-void startBooking();
 void runTheatreBooking();
 void time_date_seat();
 void buy_tickets();
 void upcoming_movies();
 void requestMovie();
 void processPayment();
+void cardPayment();
+void mobileBanking();
+void payment_receipt();
+void admin_portal();
+void updateMovieList();
 
-
-
-
-#define TOTAL_SEATS 120
-#define ROWS 10
-#define COLS 12
-
-int seats[TOTAL_SEATS] = {0};  // 0 = Available, 1 = Booked
-int ticketPrice = 500; // Example ticket price
-int totalTickets = 0;  // Stores the number of booked tickets
-
-int main()
-{
-    int n, choice;
-    char name[50];
-    char movie[50];
+int main() {
+    int choice;
     do {
         printf("\n\n----- HOME PAGE -----\n");
         printf("1. On-going movies\n");
@@ -38,240 +55,318 @@ int main()
         printf("4. Upcoming movies\n");
         printf("5. Movie request\n");
         printf("6. Payment\n");
-        printf("7. Save receipt\n");
+        printf("7. View receipt\n");
         printf("8. Admin portal\n");
         printf("9. Exit\n");
         printf("\nEnter your choice: ");
         scanf("%d", &choice);
-    
-        switch (choice) {
-            case 1: On_goingMovies();
-                break;
-            case 2: select_movie();
-                break;
-            case 3: displaySeats();
-                break;
-            case 4: upcoming_movies();
-                break;
-            case 5: requestMovie();
-                break;
-            case 6: processPayment();
-                break;
+        getchar();
 
+        switch (choice) {
+            case 1: On_goingMovies(); 
+                    break;
+            case 2: select_movie(); 
+                    break;
+            case 3: displaySeats(); 
+                    break;
+            case 4: upcoming_movies(); 
+                    break;
+            case 5: requestMovie(); 
+                    break;
+            case 6: processPayment(); 
+                    break;
+            case 7: payment_receipt(); 
+                    break;
+            case 8: admin_portal(); 
+                    break;
+            case 9: printf("Exiting...\n"); 
+                    break;
             default: printf("\nInvalid choice! Try again.\n");
-        } 
-    } while (choice != 8);
+        }
+    } while (choice != 9);
 
     return 0;
+}
+
+void admin_portal() {
+    char password[20];
+    printf("\n--- Admin Portal Login ---\n");
+    printf("Enter Admin Password: ");
+    fgets(password, sizeof(password), stdin);
+    password[strcspn(password, "\n")] = '\0';
+
+    if (strcmp(password, "admin123") == 0) {
+        int adminChoice;
+        do {
+            printf("\n--- Admin Portal ---\n");
+            printf("1. View all bookings\n");
+            printf("2. View movie requests\n");
+            printf("3. Update on-going movie list\n");
+            printf("4. Update upcoming movie list\n");
+            printf("5. Return to Home Page\n");
+            printf("Enter your choice: ");
+            scanf("%d", &adminChoice);
+            getchar();
+
+            switch (adminChoice) {
+                case 1:
+                    printf("\nTotal Tickets Booked: %d\n", totalTickets);
+                    printf("Total Amount Collected: %d BDT\n", totalTickets * ticketPrice);
+                    break;
+                case 2:
+                    printf("\n--- Requested Movies ---\n");
+                    for (int i = 0; i < requestCount; i++) {
+                        printf("Name: %s, Email: %s, Movie: %s\n", requests[i].name, requests[i].email, requests[i].movie);
+                    }
+                    break;
+                case 3:
+                    for (int i = 0; i < 3; i++) {
+                        printf("Current Movie %d: %s\n", i + 1, ongoingMovies[i]);
+                        printf("Enter new movie name: ");
+                        fgets(ongoingMovies[i], sizeof(ongoingMovies[i]), stdin);
+                        ongoingMovies[i][strcspn(ongoingMovies[i], "\n")] = '\0';
+                    }
+                    break;
+                case 4:
+                    for (int i = 0; i < 5; i++) {
+                        printf("Upcoming Movie %d: %s\n", i + 1, upcomingMovies[i]);
+                        printf("Enter new movie name: ");
+                        fgets(upcomingMovies[i], sizeof(upcomingMovies[i]), stdin);
+                        upcomingMovies[i][strcspn(upcomingMovies[i], "\n")] = '\0';
+                    }
+                    break;
+                case 5: return;
+                default: printf("Invalid choice!\n");
+            }
+        } while (adminChoice != 5);
+    } else {
+        printf("Incorrect password! Access denied.\n");
+    }
+}
+
+void requestMovie() {
+    printf("\nEnter your name: ");
+    fgets(requests[requestCount].name, sizeof(requests[requestCount].name), stdin);
+    requests[requestCount].name[strcspn(requests[requestCount].name, "\n")] = '\0';
+
+    printf("Enter your email: ");
+    fgets(requests[requestCount].email, sizeof(requests[requestCount].email), stdin);
+    requests[requestCount].email[strcspn(requests[requestCount].email, "\n")] = '\0';
+
+    printf("Enter the name of the movie you want to request: ");
+    fgets(requests[requestCount].movie, sizeof(requests[requestCount].movie), stdin);
+    requests[requestCount].movie[strcspn(requests[requestCount].movie, "\n")] = '\0';
+
+    printf("\nMovie request submitted successfully!\n");
+    requestCount++;
 }
 
 void On_goingMovies() {
     int choice;
     do {
-        printf("\ni. Mufasa\n");
-        printf("ii. La La Land\n");
-        printf("iii. Dunki\n");
-        printf("\n");
-        printf("1. Buy Ticket\n");
-        printf("2. Return to HOME PAGE\n");
+        for (int i = 0; i < 3; i++) {
+            printf("%d. %s\n", i + 1, ongoingMovies[i]);
+        }
+        printf("4. Return to HOME PAGE\n");
         printf("\nEnter your choice: ");
         scanf("%d", &choice);
 
-        switch (choice) {
-            case 1: select_movie();
-                break;
-
-            case 2: return;
-                    
-            default: printf("Please enter a valid choice!\n");    /* eikhane baki aseee!!!!!!!! */
-            }
-        } while (choice != 2);
-            
+        if (choice >= 1 && choice <= 3) {
+            strcpy(movieName, ongoingMovies[choice - 1]);
+            time_date_seat();
+        } else if (choice != 4) {
+            printf("Please enter a valid choice!\n");
+        }
+    } while (choice != 4);
 }
 
 void select_movie() {
-    int choice;
-    do {
-        printf("\n1. Mufasa\n");
-        printf("2. La La Land\n");
-        printf("3. Dunki\n");
-        printf("4. Return to Home Page\n");
-        printf("\nEnter your choice: ");
-        scanf("%d", &choice);
-
-        switch (choice) {
-            case 1:
-            case 2:
-            case 3: time_date_seat();
-                break;
-
-            case 4: return;
-
-            default: printf("Invalid choice!!\n");
-        }
-    } while (choice != 3);
+    On_goingMovies();
 }
 
 void displaySeats() {
     printf("\n        SCREEN THIS WAY\n\n");
-    
     for (int i = 0; i < ROWS; i++) {
         printf("Row %2d: ", i + 1);
         for (int j = 0; j < COLS; j++) {
             int seatIndex = i * COLS + j;
-            if (seats[seatIndex] == 0) {
-                printf("%3d ", seatIndex + 1);  // Show seat number if available
-            } else {
-                printf(" X  ");  // Show 'X' for booked seats
-            }
+            printf(seats[seatIndex] ? " X  " : "%3d ", seatIndex + 1);
         }
         printf("\n");
     }
 }
-// Function to book a seat
+
 void bookSeat(int seatNumber) {
-    if (seatNumber < 1 || seatNumber > TOTAL_SEATS) {
-        printf("Invalid seat number! Choose between 1 and %d.\n", TOTAL_SEATS);
-        return;
-    }
-    if (seats[seatNumber - 1] == 1) {
-        printf("Seat %d is already booked! Choose another seat.\n", seatNumber);
+    if (seatNumber < 1 || seatNumber > TOTAL_SEATS || seats[seatNumber - 1]) {
+        printf("Invalid or already booked seat!\n");
     } else {
-        seats[seatNumber - 1] = 1;  // Mark seat as booked
-        totalTickets++;  // Increment the number of booked tickets
+        seats[seatNumber - 1] = 1;
+        bookedSeats[totalTickets++] = seatNumber;
         printf("Seat %d successfully booked!\n", seatNumber);
     }
 }
 
-// Function to start booking process
-void startBooking() {
+void runTheatreBooking() {
     int seatNumber;
-    
     while (1) {
         displaySeats();
-        
         printf("\nEnter seat number to book (1-120) or 0 to exit: ");
         scanf("%d", &seatNumber);
-        
-        if (seatNumber == 0) {
-            printf("Thank you for booking! Please pay for ticket from Home Page :)\n");
-            return;
-        }
-        
+        if (seatNumber == 0) break;
         bookSeat(seatNumber);
     }
+    printf("\nThank you for booking! Please proceed to payment from the Home Menu.\n");
 }
-// Entry function to call everything
-void runTheatreBooking() {
-    startBooking();
-}
+
 void time_date_seat() {
     int time_choice, date_choice;
-        printf("Select show-time:\n");
-        printf("1. 11:20 am \n2. 4:20 pm \n3. 7:45pm\n");
-        printf("Enter your time choice: ");
-        scanf("%d", &time_choice);
-        printf("\n");
-        printf("\nSelect show-date:\n");
-        printf("1. 31/03/2025 \n2. 07/04/2025 \n3. 12/05/2025\n");
-        printf("Enter your date choice: ");
-        scanf("%d", &date_choice);
-        printf("\n");
+    printf("Select show-time:\n1. 11:20 am\n2. 4:20 pm\n3. 7:45 pm\nEnter your time choice: ");
+    scanf("%d", &time_choice);
+    printf("\nSelect show-date:\n1. 31/03/2025\n2. 07/04/2025\n3. 12/05/2025\nEnter your date choice: ");
+    scanf("%d", &date_choice);
 
-        buy_tickets();
-        runTheatreBooking();
-    }
+    strcpy(timeSelected, (time_choice == 1) ? "11:20 am" : (time_choice == 2) ? "4:20 pm" : "7:45 pm");
+    strcpy(dateSelected, (date_choice == 1) ? "31/03/2025" : (date_choice == 2) ? "07/04/2025" : "12/05/2025");
+    strcpy(hall, "Main Hall");
 
+    buy_tickets();
+    runTheatreBooking();
+}
 
 void buy_tickets() {
-    char name[50], email[100], contact[15];
+    printf("\n------ Ticket Booking Page ------\n");
 
-        printf("\n------ Ticket Booking Page ------\n");
+    printf("Name: ");
+    getchar(); // clear buffer
+    fgets(userName, sizeof(userName), stdin);
+    userName[strcspn(userName, "\n")] = '\0';
 
-        fflush(stdin); // Flush the input buffer (may not work in GCC)
-        printf("Name: ");
-        gets(name);
+    printf("Email address: ");
+    fgets(userEmail, sizeof(userEmail), stdin);
+    userEmail[strcspn(userEmail, "\n")] = '\0';
 
-        printf("EMAIL address: ");
-        gets(email);
+    printf("Contact number: ");
+    fgets(userPhone, sizeof(userPhone), stdin);
+    userPhone[strcspn(userPhone, "\n")] = '\0';
 
-        printf("Contact number: ");
-        gets(contact);
-
-        printf("\nThank you, %s! Your ticket details have been recorded.\n", name);
+    printf("\nThank you, %s! Your ticket details have been recorded.\n", userName);
 }
 
-void upcoming_movies() {
-        printf("\n--- Upcoming Movies ---\n");
-        printf("1. Deadpool & Wolverine\n");
-        printf("2. Inside Out 2\n");
-        printf("3. The Joker 2\n");
-        printf("\nReturning to HOME PAGE...\n");
-}
-
-void requestMovie() {
-    char movie[50];
-    printf("\nEnter the name of the movie you want to request (Press enter to finish):\n");
-    getchar();
-    while (1) {
-        fgets(movie, sizeof(movie), stdin);
-        if (strcmp(movie, "\n") == 0) {
-            break;
-        }
-        printf("Movie '%s' has been requested. Enter another or press enter to finish...\n", movie);
-    }
-}
-
-void processPayment() {
-    int paymentType, mobileChoice;
-    char transactionID[50], phoneNumber[15];
-    int totalAmount = totalTickets * ticketPrice;
-
-    if (totalTickets == 0) {
-        printf("\nNo tickets booked yet! Please book your tickets first.\n");
+void payment_receipt() {
+    FILE *receiptFile = fopen("ticket.txt", "a");
+    if (receiptFile == NULL) {
+        printf("Error opening receipt file.\n");
         return;
     }
 
+    printf("\n------ Printing Receipt ------\n");
+
+    fprintf(receiptFile, "\n======= TICKET RECEIPT =======\n");
+    fprintf(receiptFile, "Name           : %s\n", userName);
+    fprintf(receiptFile, "Email          : %s\n", userEmail);
+    fprintf(receiptFile, "Contact Number : %s\n", userPhone);
+    fprintf(receiptFile, "Movie          : %s\n", movieName);
+    fprintf(receiptFile, "Date           : %s\n", dateSelected);
+    fprintf(receiptFile, "Time           : %s\n", timeSelected);
+    fprintf(receiptFile, "Hall           : %s\n", hall);
+    fprintf(receiptFile, "Seats Booked   : ");
+
+    for (int i = 0; i < totalTickets; i++) {
+        fprintf(receiptFile, "%d ", bookedSeats[i]);
+    }
+
+    fprintf(receiptFile, "\nTotal Tickets  : %d\n", totalTickets);
+    fprintf(receiptFile, "Total Amount   : %d BDT\n", totalTickets * ticketPrice);
+    fprintf(receiptFile, "Payment Method : %s\n", paymentMethod);
+
+    if (strcmp(paymentMethod, "Cash") == 0) {
+        fprintf(receiptFile, "Note           : Please arrive early and pay in cash.\n");
+    } else if (strcmp(paymentMethod, "Mobile Banking") == 0) {
+        fprintf(receiptFile, "Note           : Payment confirmed via mobile banking.\n");
+    } else if (strcmp(paymentMethod, "Card") == 0) {
+        fprintf(receiptFile, "Note           : Paid via card successfully.\n");
+    }
+
+    fprintf(receiptFile, "==============================\n\n");
+    fclose(receiptFile);
+
+    printf("Receipt saved successfully to 'ticket.txt'\n");
+}
+
+void processPayment() {
+    int method;
     printf("\n--- Payment Options ---\n");
-    printf("1. Cash Payment\n");
-    printf("2. Mobile Banking\n");
-    printf("3. Card Payment\n");
-    printf("\nEnter your choice: ");
-    scanf("%d", &paymentType);
+    printf("1. Cash\n");
+    printf("2. Card\n");
+    printf("3. Mobile Banking\n");
+    printf("Enter your payment method: ");
+    scanf("%d", &method);
+    getchar(); // clear buffer
 
-    switch (paymentType) {
+    switch (method) {
         case 1:
-            printf("\nTotal amount: %d BDT\n", totalAmount);
-            printf("Please arrive at least 30-40 minutes before the movie starts to complete the payment.\n");
+            strcpy(paymentMethod, "Cash");
+            printf("Payment will be made at the counter. Please arrive at least 30 minutes before your movie starts and don't forget to bring your eReceipt.\n");
             break;
-
         case 2:
-            printf("\nChoose Mobile Banking Option:\n");
-            printf("1. Bkash\n");
-            printf("2. Nagad\n");
-            printf("3. Rocket\n");
-            printf("\nEnter your choice: ");
-            scanf("%d", &mobileChoice);
-
-            printf("\nTotal amount: %d BDT\n", totalAmount);
-            printf("Payment number: 01XXXXXXXXX\n");
-
-            printf("Enter your transaction ID: ");
-            scanf("%s", transactionID);
-
-            printf("Enter your mobile number used for payment: ");
-            scanf("%s", phoneNumber);
-            
-            printf("\nPayment Successful! Transaction ID: %s\n", transactionID);
+            cardPayment();
             break;
-
         case 3:
-            printf("\nTotal amount: %d BDT\n", totalAmount);
-            printf("Processing card payment...\n");
-            printf("Payment Successful!\n");
+            mobileBanking();
             break;
-
         default:
-            printf("\nInvalid payment option!\n");
+            printf("Invalid payment option.\n");
+            return;
+    }
+}
+
+void cardPayment() {
+    char cardDetails[50];
+    char cardHolder[80];
+    char cardValid[30];
+    printf("\ncard number: ");
+    scanf("%s", cardDetails);
+    printf("Card holder name: ");
+    scanf("%s", cardHolder);
+    printf("Card validation: ");
+    scanf("%s", cardValid);
+    strcpy(paymentMethod, "Card");
+    printf("\nPayment Successful.\n");
+    payment_receipt();
+}
+
+void mobileBanking() {
+    char provider[30];
+    char number[20];
+    char trxID[20];
+
+    printf("\n--- Mobile Banking Payment ---\n");
+    printf("Enter Mobile Banking Provider (e.g., bKash, Nagad, Rocket): ");
+    fgets(provider, sizeof(provider), stdin);
+    provider[strcspn(provider, "\n")] = '\0';
+
+    printf("Enter Mobile Number: ");
+    fgets(number, sizeof(number), stdin);
+    number[strcspn(number, "\n")] = '\0';
+
+    printf("Enter Transaction ID: ");
+    fgets(trxID, sizeof(trxID), stdin);
+    trxID[strcspn(trxID, "\n")] = '\0';
+
+    strcpy(paymentMethod, "Mobile Banking");
+    printf("Payment successful through %s (Number: %s, TrxID: %s)\n", provider, number, trxID);
+}
+
+void upcoming_movies() {
+    printf("\nUpcoming Movies:\n");
+    for (int i = 0; i < 5; i++) {
+        printf("%d. %s\n", i + 1, upcomingMovies[i]);
+    }
+    printf("\nSelect a movie to book tickets or press 0 to go back: ");
+    int choice;
+    scanf("%d", &choice);
+    if (choice >= 1 && choice <= 5) {
+        strcpy(movieName, upcomingMovies[choice - 1]);
+        select_movie();
     }
 }
